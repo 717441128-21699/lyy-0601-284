@@ -41,7 +41,10 @@ const ReminderItem: React.FC<ReminderItemProps> = ({ reminder, onToggle }) => {
         </View>
         <View
           className={classnames(styles.switch, reminder.enabled && styles.switchOn)}
-          onClick={() => onToggle?.(reminder.id)}
+          onClick={(e) => {
+            e.stopPropagation?.()
+            onToggle?.(reminder.id)
+          }}
         >
           <View className={styles.switchHandle} />
         </View>

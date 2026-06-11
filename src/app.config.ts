@@ -6,7 +6,8 @@ export default defineAppConfig({
     'pages/reminders/index',
     'pages/settings/index',
     'pages/habits/index',
-    'pages/report/index'
+    'pages/report/index',
+    'pages/record-detail/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -1,0 +1,144 @@
+@use '@/styles/variables.scss' as *;
+
+.calendar {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.navBtn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-lg;
+  color: $color-text-secondary;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.7; transform: scale(0.95); }
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.weekRow {
+  display: flex;
+  margin-bottom: $spacing-md;
+}
+
+.weekCell {
+  flex: 1;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  padding: $spacing-sm 0;
+}
+
+.daysGrid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dayCell {
+  width: calc(100% / 7);
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all $transition-fast;
+}
+
+.dayInner {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  transition: all $transition-fast;
+  &:active { transform: scale(0.9); }
+}
+
+.dayEmpty {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dayOtherMonth {
+  opacity: 0.3;
+}
+
+.dayNumber {
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+}
+
+.dayGood .dayInner {
+  background: rgba(82, 196, 26, 0.18);
+}
+
+.dayNormal .dayInner {
+  background: rgba(250, 173, 20, 0.18);
+}
+
+.dayBad .dayInner {
+  background: rgba(255, 77, 79, 0.15);
+}
+
+.dayGood .dayNumber { color: $color-success; }
+.dayNormal .dayNumber { color: $color-warning; }
+.dayBad .dayNumber { color: $color-error; }
+
+.dayToday .dayInner {
+  border: 3rpx solid $color-primary;
+}
+
+.daySelected .dayInner {
+  background: linear-gradient(135deg, $color-primary, $color-primary-light) !important;
+}
+
+.daySelected .dayNumber {
+  color: $color-text-white !important;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+}
+
+.legendDot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-xs;
+}
+
+.legendText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

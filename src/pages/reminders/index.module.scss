@@ -3,7 +3,7 @@
 .page {
   min-height: 100vh;
   background: $color-bg-gradient;
-  padding: $spacing-lg $page-padding 60rpx;
+  padding: $spacing-lg $page-padding 120rpx;
 }
 
 .header {
@@ -20,17 +20,6 @@
   font-size: $font-size-md;
   color: $color-text-secondary;
   margin-top: $spacing-xs;
-}
-
-.section {
-  margin-bottom: $spacing-xl;
-}
-
-.sectionTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $color-text-primary;
-  margin-bottom: $spacing-md;
 }
 
 .tipCard {
@@ -58,6 +47,53 @@
   font-size: $font-size-sm;
   color: $color-text-secondary;
   line-height: 1.6;
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionAction {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  background: rgba(91, 95, 199, 0.08);
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-round;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}
+
+.groupDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.emptyGroup {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  text-align: center;
+  box-shadow: $shadow-card;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
 }
 
 .addBtn {

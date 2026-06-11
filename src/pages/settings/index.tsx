@@ -5,17 +5,33 @@ import { useSleepStore } from '@/store/SleepStore'
 import styles from './index.module.scss'
 
 const SettingsPage: React.FC = () => {
-  const { profile, updateProfile } = useSleepStore()
+  const { profile, updateProfile, resetData } = useSleepStore()
 
   const handleChangeTarget = (delta: number) => {
     const newValue = Math.min(12, Math.max(4, profile.targetSleepHours + delta))
     updateProfile({ targetSleepHours: newValue })
   }
 
+  const handleResetData = () => {
+    Taro.showModal({
+      title: '重置数据',
+      content: '确定要重置所有睡眠数据吗？此操作不可撤销。',
+      confirmText: '确定重置',
+      confirmColor: '#FF4D4F',
+      success: (res) => {
+        if (res.confirm) {
+          resetData()
+        }
+      }
+    })
+  }
+
   const handleItemClick = (type: string) => {
     console.log('[Settings] Click item', type)
     if (type === 'report') {
       Taro.navigateTo({ url: '/pages/report/index' })
+    } else if (type === 'reset') {
+      handleResetData()
     } else {
       Taro.showToast({ title: '功能开发中', icon: 'none' })
     }
@@ -78,6 +94,12 @@ const SettingsPage: React.FC = () => {
             <View className={styles.listIcon}><Text>📊</Text></View>
             <Text className={styles.listLabel}>导出数据</Text>
             <Text className={styles.listValue}>CSV/Excel</Text>
+            <Text className={styles.listArrow}>›</Text>
+          </View>
+          <View className={styles.listItem} onClick={() => handleItemClick('reset')}>
+            <View className={styles.listIcon}><Text>🔄</Text></View>
+            <Text className={styles.listLabel}>重置所有数据</Text>
+            <Text className={styles.listValue}>恢复初始状态</Text>
             <Text className={styles.listArrow}>›</Text>
           </View>
           <View className={styles.listItem} onClick={() => handleItemClick('sync')}>

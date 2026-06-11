@@ -69,7 +69,7 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [data])
 
   const addRecord = useCallback((record: Partial<SleepRecord>) => {
-    const today = formatDate(new Date())
+    const targetDate = record.date || formatDate(new Date())
     const bedTime = record.bedTime || '23:00'
     const wakeTime = record.wakeTime || '07:00'
     const duration = calculateSleepDuration(bedTime, wakeTime)
@@ -82,7 +82,7 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     })
     const newRecord: SleepRecord = {
       id: generateId(),
-      date: today,
+      date: targetDate,
       bedTime,
       wakeTime,
       nightWakeCount: record.nightWakeCount || 0,
@@ -93,7 +93,7 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       score
     }
     setData(prev => {
-      const existing = prev.records.findIndex(r => r.date === today)
+      const existing = prev.records.findIndex(r => r.date === targetDate)
       let newRecords: SleepRecord[]
       if (existing >= 0) {
         newRecords = [...prev.records]

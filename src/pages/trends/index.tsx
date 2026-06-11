@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import TrendChart from '@/components/TrendChart'
+import SleepCalendar from '@/components/SleepCalendar'
 import { useSleepStore } from '@/store/SleepStore'
 import { getFactorTips } from '@/utils'
 import styles from './index.module.scss'
@@ -9,6 +10,7 @@ import styles from './index.module.scss'
 const TrendsPage: React.FC = () => {
   const { records } = useSleepStore()
   const [mode, setMode] = useState<'week' | 'month'>('week')
+  const [showCalendar, setShowCalendar] = useState(false)
 
   const displayData = useMemo(() => {
     const count = mode === 'week' ? 7 : 30
@@ -49,6 +51,10 @@ const TrendsPage: React.FC = () => {
     return getFactorTips(records.slice(-count))
   }, [records, mode])
 
+  const handleSelectDate = (date: string) => {
+    Taro.navigateTo({ url: `/pages/record-detail/index?date=${date}` })
+  }
+
   const gotoReport = () => {
     Taro.navigateTo({ url: '/pages/report/index' })
   }
@@ -66,6 +72,24 @@ const TrendsPage: React.FC = () => {
           <Text className={styles.statUnit}> 小时</Text>
           <Text className={styles.statLabel}>{mode === 'week' ? '周' : '月'}平均时长</Text>
         </View>
+      </View>
+
+      <View className={styles.section}>
+        <View className={styles.sectionHeader}>
+          <Text className={styles.sectionTitle}>睡眠日历</Text>
+          <Button
+            className={styles.sectionAction}
+            onClick={() => setShowCalendar(v => !v)}
+          >
+            {showCalendar ? '收起' : '展开'}
+          </Button>
+        </View>
+        {showCalendar && (
+          <SleepCalendar
+            records={records}
+            onSelectDate={handleSelectDate}
+          />
+        )}
       </View>
 
       <View className={styles.section}>

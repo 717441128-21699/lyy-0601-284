@@ -32,44 +32,108 @@ const ReportPage: React.FC = () => {
 
   const factorTips = useMemo(() => getFactorTips(records.slice(-30)), [records])
 
+  const wrapText = (ctx: any, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    let line = ''
+    let lineCount = 0
+    for (let i = 0; i < text.length; i++) {
+      const testLine = line + text[i]
+      const metrics = ctx.measureText ? ctx.measureText(testLine) : { width: testLine.length * 12 }
+      const testWidth = metrics.width
+      if (testWidth > maxWidth && i > 0) {
+        ctx.fillText(line, x, y)
+        line = text[i]
+        y += lineHeight
+        lineCount++
+      } else {
+        line = testLine
+      }
+    }
+    ctx.fillText(line, x, y)
+    return lineCount + 1
+  }
+
   const drawReportCanvas = (ctx: any, dpr: number, canvasWidth: number) => {
     const w = canvasWidth
-    const h = 1200
+    const CANVAS_HEIGHT = 1400
+    const h = CANVAS_HEIGHT
     const gradient = ctx.createLinearGradient(0, 0, 0, h)
     gradient.addColorStop(0, '#F0ECF9')
     gradient.addColorStop(1, '#FFFFFF')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, w, h)
 
-    const headerGradient = ctx.createLinearGradient(0, 0, w, 240)
+    const headerGradient = ctx.createLinearGradient(0, 0, w, 260)
     headerGradient.addColorStop(0, '#5B5FC7')
     headerGradient.addColorStop(1, '#8B7EC8')
     ctx.fillStyle = headerGradient
-    ctx.fillRect(0, 0, w, 240)
+    ctx.fillRect(0, 0, w, 260)
 
     ctx.fillStyle = '#FFFFFF'
     ctx.font = `bold ${32 * dpr}px sans-serif`
-    ctx.fillText('近30天睡眠报告', 40 * dpr, 70 * dpr)
+    ctx.fillText('睡眠健康报告', 40 * dpr, 70 * dpr)
 
     const quality = getSleepQuality(reportData.avg30Score)
-    ctx.font = `bold ${80 * dpr}px sans-serif`
+    ctx.font = `bold ${72 * dpr}px sans-serif`
     ctx.fillStyle = '#FFFFFF'
-    ctx.fillText(`${reportData.avg30Score} 分`, 40 * dpr, 150 * dpr)
+    ctx.fillText(`${reportData.avg30Score} 分`, 40 * dpr, 155 * dpr)
 
     ctx.fillStyle = quality.color
-    ctx.fillRect(260 * dpr, 110 * dpr, 120 * dpr, 48 * dpr)
+    ctx.fillRect(250 * dpr, 115 * dpr, 110 * dpr, 44 * dpr)
     ctx.fillStyle = '#FFFFFF'
-    ctx.font = `${24 * dpr}px sans-serif`
-    ctx.fillText(quality.text, 275 * dpr, 145 * dpr)
+    ctx.font = `${22 * dpr}px sans-serif`
+    ctx.fillText(quality.text, 268 * dpr, 148 * dpr)
 
-    ctx.font = `${24 * dpr}px sans-serif`
+    ctx.font = `${22 * dpr}px sans-serif`
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-    ctx.fillText(`${profile.name} · 生成于 ${new Date().toLocaleDateString()}`, 40 * dpr, 200 * dpr)
+    ctx.fillText(`${profile.name} · 生成于 ${new Date().toLocaleDateString()}`, 40 * dpr, 210 * dpr)
+    ctx.fillText('近30天数据统计', 40 * dpr, 240 * dpr)
 
-    let y = 270 * dpr
+    let y = 290 * dpr
 
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${28 * dpr}px sans-serif`
+    ctx.font = `bold ${26 * dpr}px sans-serif`
+    ctx.fillText('📈 趋势变化', 40 * dpr, y)
+    y += 30 * dpr
+
+    const trendY = y
+    ctx.fillStyle = '#FFFFFF'
+    ctx.fillRect(40 * dpr, trendY, w - 80 * dpr, 140 * dpr)
+
+    const scoreDiff = reportData.avg7Score - reportData.avg30Score
+    const diffText = scoreDiff >= 0 ? `+${scoreDiff}` : `${scoreDiff}`
+    const diffColor = scoreDiff >= 0 ? '#52C41A' : '#FF7875'
+
+    ctx.fillStyle = '#5E5D7D'
+    ctx.font = `${20 * dpr}px sans-serif`
+    ctx.fillText('近30天均分', 60 * dpr, trendY + 40 * dpr)
+    ctx.fillStyle = '#1A1B3E'
+    ctx.font = `bold ${36 * dpr}px sans-serif`
+    ctx.fillText(`${reportData.avg30Score}`, 60 * dpr, trendY + 82 * dpr)
+
+    ctx.fillStyle = '#5E5D7D'
+    ctx.font = `${20 * dpr}px sans-serif`
+    ctx.fillText('近7天均分', w / 2 + 20 * dpr, trendY + 40 * dpr)
+    ctx.fillStyle = '#1A1B3E'
+    ctx.font = `bold ${36 * dpr}px sans-serif`
+    ctx.fillText(`${reportData.avg7Score}`, w / 2 + 20 * dpr, trendY + 82 * dpr)
+
+    ctx.fillStyle = diffColor
+    ctx.font = `bold ${26 * dpr}px sans-serif`
+    ctx.fillText(`${diffText}分`, 60 * dpr, trendY + 125 * dpr)
+    ctx.fillStyle = '#5E5D7D'
+    ctx.font = `${20 * dpr}px sans-serif`
+    ctx.fillText(scoreDiff >= 0 ? '较近30天提升' : '较近30天下降', 110 * dpr, trendY + 125 * dpr)
+
+    if (reportData.bestDay) {
+      ctx.fillStyle = '#FAAD14'
+      ctx.font = `${20 * dpr}px sans-serif`
+      ctx.fillText(`🏆 最佳 ${reportData.bestDay.date} (${reportData.bestDay.score}分)`, w / 2 + 20 * dpr, trendY + 125 * dpr)
+    }
+
+    y = trendY + 160 * dpr
+
+    ctx.fillStyle = '#1A1B3E'
+    ctx.font = `bold ${26 * dpr}px sans-serif`
     ctx.fillText('📊 数据概览', 40 * dpr, y)
     y += 30 * dpr
 
@@ -81,59 +145,50 @@ const ReportPage: React.FC = () => {
     ]
 
     stats.forEach((stat, i) => {
-      const rowY = y + 30 * dpr + i * 70 * dpr
+      const rowY = y + 20 * dpr + i * 65 * dpr
       ctx.fillStyle = '#FFFFFF'
-      if (i === stats.length - 1) {
-        ctx.fillRect(40 * dpr, rowY - 20 * dpr, w - 80 * dpr, 60 * dpr)
-      } else {
-        ctx.fillRect(40 * dpr, rowY - 20 * dpr, w - 80 * dpr, 70 * dpr)
-      }
+      ctx.fillRect(40 * dpr, rowY - 15 * dpr, w - 80 * dpr, 58 * dpr)
 
       ctx.fillStyle = '#5E5D7D'
-      ctx.font = `${26 * dpr}px sans-serif`
-      ctx.fillText(`${stat.icon}  ${stat.label}`, 60 * dpr, rowY + 20 * dpr)
+      ctx.font = `${24 * dpr}px sans-serif`
+      ctx.fillText(`${stat.icon}  ${stat.label}`, 60 * dpr, rowY + 22 * dpr)
 
       ctx.fillStyle = '#1A1B3E'
-      ctx.font = `bold ${28 * dpr}px sans-serif`
+      ctx.font = `bold ${26 * dpr}px sans-serif`
       const textWidth = ctx.measureText ? ctx.measureText(stat.value).width : 100
-      ctx.fillText(stat.value, w - 60 * dpr - textWidth, rowY + 20 * dpr)
+      ctx.fillText(stat.value, w - 60 * dpr - textWidth, rowY + 22 * dpr)
     })
 
-    y += stats.length * 70 * dpr + 20 * dpr
+    y += stats.length * 65 * dpr + 30 * dpr
 
-    y += 20 * dpr
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${28 * dpr}px sans-serif`
+    ctx.font = `bold ${26 * dpr}px sans-serif`
     ctx.fillText('💡 改善建议', 40 * dpr, y)
     y += 30 * dpr
 
     const tips = factorTips.length > 0 ? factorTips.slice(0, 3) : [
-      { factor: '继续保持', impact: 'positive', message: '你的睡眠状态良好，请继续保持规律作息和健康生活习惯。' }
+      { factor: '继续保持', impact: 'positive' as const, message: '你的睡眠状态良好，请继续保持规律作息和健康生活习惯。' }
     ]
 
     tips.forEach((tip, i) => {
-      const tipY = y + 20 * dpr + i * 100 * dpr
+      const tipY = y + 15 * dpr + i * 110 * dpr
       ctx.fillStyle = '#FFFFFF'
-      ctx.fillRect(40 * dpr, tipY, w - 80 * dpr, 90 * dpr)
+      ctx.fillRect(40 * dpr, tipY, w - 80 * dpr, 100 * dpr)
 
-      ctx.fillStyle = tip.impact === 'positive' ? '#52C41A' : '#FFB870'
-      ctx.beginPath()
-      ctx.moveTo(40 * dpr, tipY)
-      ctx.lineTo(40 * dpr, tipY + 90 * dpr)
-      ctx.lineWidth = 6 * dpr
-      ctx.strokeStyle = tip.impact === 'positive' ? '#52C41A' : '#FFB870'
-      ctx.stroke()
+      const barColor = tip.impact === 'positive' ? '#52C41A' : '#FFB870'
+      ctx.fillStyle = barColor
+      ctx.fillRect(40 * dpr, tipY, 6 * dpr, 100 * dpr)
 
       ctx.fillStyle = '#1A1B3E'
-      ctx.font = `bold ${26 * dpr}px sans-serif`
+      ctx.font = `bold ${24 * dpr}px sans-serif`
       ctx.fillText(tip.factor, 60 * dpr, tipY + 38 * dpr)
 
       ctx.fillStyle = '#5E5D7D'
-      ctx.font = `${22 * dpr}px sans-serif`
-      ctx.fillText(tip.message, 60 * dpr, tipY + 72 * dpr)
+      ctx.font = `${20 * dpr}px sans-serif`
+      wrapText(ctx, tip.message, 60 * dpr, tipY + 68 * dpr, w - 160 * dpr, 24 * dpr)
     })
 
-    y += tips.length * 100 * dpr + 30 * dpr
+    y += tips.length * 110 * dpr + 40 * dpr
 
     ctx.fillStyle = '#9A99B8'
     ctx.font = `${20 * dpr}px sans-serif`
@@ -141,7 +196,7 @@ const ReportPage: React.FC = () => {
     ctx.fillText('—— 好梦睡眠 · 科学睡眠健康管理 ——', w / 2, h - 40 * dpr)
     ctx.textAlign = 'left'
 
-    console.log('[Report] Canvas drawn')
+    console.log('[Report] Canvas drawn, height:', h)
   }
 
   const generateShareImage = async () => {
@@ -169,7 +224,7 @@ const ReportPage: React.FC = () => {
           const ctx = canvas.getContext('2d')
           const dpr = Taro.getSystemInfoSync().pixelRatio || 2
           const canvasWidth = 375
-          const canvasHeight = 600
+          const canvasHeight = 700
 
           canvas.width = canvasWidth * dpr
           canvas.height = canvasHeight * dpr
@@ -201,7 +256,7 @@ const ReportPage: React.FC = () => {
                 setPreviewVisible(true)
               }
             })
-          }, 100)
+          }, 200)
         })
     } catch (e) {
       console.error('[Report] Generate image error:', e)
@@ -353,7 +408,7 @@ const ReportPage: React.FC = () => {
           id="reportCanvas"
           type="2d"
           ref={canvasRef}
-          style={{ width: '375px', height: '600px' }}
+          style={{ width: '375px', height: '700px' }}
         />
       </View>
 

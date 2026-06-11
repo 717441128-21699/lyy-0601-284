@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, Button } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useDidHide, useDidShow } from '@tarojs/taro'
 import RelaxCard from '@/components/RelaxCard'
 import { noiseSources, mockChecklistItems } from '@/data/mockData'
 import styles from './index.module.scss'
@@ -13,6 +13,7 @@ const RelaxPage: React.FC = () => {
   const [checklist, setChecklist] = useState(mockChecklistItems)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const audioRef = useRef<any>(null)
+  const wasPlayingRef = useRef<string | null>(null)
 
   useEffect(() => {
     audioRef.current = Taro.createInnerAudioContext()
@@ -23,28 +24,44 @@ const RelaxPage: React.FC = () => {
     audioRef.current.onPause(() => {
       console.log('[Relax] Audio paused')
     })
+    audioRef.current.onStop(() => {
+      console.log('[Relax] Audio stopped')
+    })
     audioRef.current.onError((err: any) => {
       console.error('[Relax] Audio error', err)
       Taro.showToast({ title: '音频加载失败', icon: 'none' })
+      if (audioRef.current) {
+        try { audioRef.current.stop() } catch (e) {}
+      }
       setPlayingNoiseId(null)
+      wasPlayingRef.current = null
     })
     return () => {
       if (audioRef.current) {
-        audioRef.current.stop()
-        audioRef.current.destroy()
+        try {
+          audioRef.current.stop()
+          audioRef.current.destroy()
+        } catch (e) {}
       }
     }
   }, [])
 
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.stop()
-      }
+  useDidHide(() => {
+    console.log('[Relax] Page did hide, stopping audio')
+    if (audioRef.current && playingNoiseId) {
+      wasPlayingRef.current = playingNoiseId
+      try { audioRef.current.stop() } catch (e) {}
       setPlayingNoiseId(null)
-      console.log('[Relax] Page unmount, audio stopped')
     }
-  }, [])
+    if (breathing) {
+      setBreathing(false)
+    }
+  })
+
+  useDidShow(() => {
+    console.log('[Relax] Page did show, wasPlaying:', wasPlayingRef.current)
+    wasPlayingRef.current = null
+  })
 
   useEffect(() => {
     if (breathing) {
@@ -74,20 +91,31 @@ const RelaxPage: React.FC = () => {
 
   const toggleNoise = (noiseId: string) => {
     const noise = noiseSources.find(n => n.id === noiseId)
-    if (!noise) return
+    if (!noise || !audioRef.current) return
 
     if (playingNoiseId === noiseId) {
-      audioRef.current?.pause()
+      try {
+        audioRef.current.stop()
+      } catch (e) {
+        console.error('[Relax] Stop error:', e)
+      }
       setPlayingNoiseId(null)
-      console.log('[Relax] Pause noise:', noise.name)
+      wasPlayingRef.current = null
+      console.log('[Relax] Stop noise:', noise.name)
     } else {
-      if (audioRef.current) {
+      try {
         audioRef.current.stop()
         audioRef.current.src = noise.url
         audioRef.current.play()
         setPlayingNoiseId(noiseId)
+        wasPlayingRef.current = noiseId
         console.log('[Relax] Play noise:', noise.name, noise.url)
         Taro.showToast({ title: `播放 ${noise.name}`, icon: 'none', duration: 1500 })
+      } catch (e) {
+        console.error('[Relax] Play error:', e)
+        Taro.showToast({ title: '播放失败，请稍后重试', icon: 'none' })
+        setPlayingNoiseId(null)
+        wasPlayingRef.current = null
       }
     }
   }

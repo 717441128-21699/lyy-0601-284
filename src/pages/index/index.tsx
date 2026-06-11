@@ -1,31 +1,79 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro from '@tarojs/taro'
+import Taro, { useRouter } from '@tarojs/taro'
 import SleepScoreCard from '@/components/SleepScoreCard'
 import RecordItem from '@/components/RecordItem'
 import { useSleepStore } from '@/store/SleepStore'
-import { getFactorTips } from '@/utils'
+import { getFactorTips, formatDate } from '@/utils'
 import styles from './index.module.scss'
 
 const RecordPage: React.FC = () => {
-  const { records, habits, getTodayRecord, addRecord } = useSleepStore()
-  const today = getTodayRecord() || records[records.length - 1]
+  const router = useRouter()
+  const { records, habits, addRecord, updateRecord } = useSleepStore()
+  const today = formatDate(new Date())
+  const urlDate = router.params.date
+  const [editingDate, setEditingDate] = useState(urlDate || today)
 
-  const [bedTime, setBedTime] = useState(today?.bedTime || '23:00')
-  const [wakeTime, setWakeTime] = useState(today?.wakeTime || '07:00')
-  const [nightWakeCount, setNightWakeCount] = useState(today?.nightWakeCount || 0)
-  const [napDuration, setNapDuration] = useState(today?.napDuration || 0)
-  const [coffeeIntake, setCoffeeIntake] = useState(today?.coffeeIntake || 1)
-  const [exerciseDuration, setExerciseDuration] = useState(today?.exerciseDuration || 30)
+  useEffect(() => {
+    if (urlDate) {
+      setEditingDate(urlDate)
+    }
+  }, [urlDate])
+
+  const existingRecord = useMemo(() => {
+    return records.find(r => r.date === editingDate)
+  }, [records, editingDate])
+
+  const [bedTime, setBedTime] = useState(existingRecord?.bedTime || '23:00')
+  const [wakeTime, setWakeTime] = useState(existingRecord?.wakeTime || '07:00')
+  const [nightWakeCount, setNightWakeCount] = useState(existingRecord?.nightWakeCount || 0)
+  const [napDuration, setNapDuration] = useState(existingRecord?.napDuration || 0)
+  const [coffeeIntake, setCoffeeIntake] = useState(existingRecord?.coffeeIntake || 1)
+  const [exerciseDuration, setExerciseDuration] = useState(existingRecord?.exerciseDuration || 30)
+
+  useEffect(() => {
+    if (existingRecord) {
+      setBedTime(existingRecord.bedTime)
+      setWakeTime(existingRecord.wakeTime)
+      setNightWakeCount(existingRecord.nightWakeCount)
+      setNapDuration(existingRecord.napDuration)
+      setCoffeeIntake(existingRecord.coffeeIntake)
+      setExerciseDuration(existingRecord.exerciseDuration)
+    } else {
+      setBedTime('23:00')
+      setWakeTime('07:00')
+      setNightWakeCount(0)
+      setNapDuration(0)
+      setCoffeeIntake(1)
+      setExerciseDuration(30)
+    }
+  }, [existingRecord?.id, editingDate])
+
+  const computedScore = useMemo(() => {
+    const { calculateSleepDuration, calculateSleepScore } = require('@/utils')
+    const duration = calculateSleepDuration(bedTime, wakeTime)
+    return calculateSleepScore({
+      duration,
+      nightWakeCount,
+      napDuration,
+      coffeeIntake,
+      exerciseDuration
+    })
+  }, [bedTime, wakeTime, nightWakeCount, napDuration, coffeeIntake, exerciseDuration])
+
+  const computedDuration = useMemo(() => {
+    const { calculateSleepDuration } = require('@/utils')
+    return calculateSleepDuration(bedTime, wakeTime)
+  }, [bedTime, wakeTime])
 
   const recentRecords = useMemo(() => records.slice(-7), [records])
   const factorTips = useMemo(() => getFactorTips(recentRecords), [recentRecords])
 
   const handleBedTime = () => {
     Taro.showActionSheet({
-      itemList: ['21:00', '21:30', '22:00', '22:30', '23:00', '23:30', '00:00'],
+      itemList: ['21:00', '21:30', '22:00', '22:30', '23:00', '23:30', '00:00', '00:30'],
       success: (res) => {
-        const times = ['21:00', '21:30', '22:00', '22:30', '23:00', '23:30', '00:00']
+        const times = ['21:00', '21:30', '22:00', '22:30', '23:00', '23:30', '00:00', '00:30']
         setBedTime(times[res.tapIndex])
       }
     })
@@ -33,42 +81,102 @@ const RecordPage: React.FC = () => {
 
   const handleWakeTime = () => {
     Taro.showActionSheet({
-      itemList: ['05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30'],
+      itemList: ['05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00'],
       success: (res) => {
-        const times = ['05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30']
+        const times = ['05:00', '05:30', '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00']
         setWakeTime(times[res.tapIndex])
       }
     })
   }
 
-  const handleSave = () => {
-    addRecord({
-      bedTime,
-      wakeTime,
-      nightWakeCount,
-      napDuration,
-      coffeeIntake,
-      exerciseDuration
+  const handleDateChange = () => {
+    const dates: string[] = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      dates.push(formatDate(d))
+    }
+    Taro.showActionSheet({
+      itemList: dates.map(d => d === today ? `${d} (今天)` : d),
+      success: (res) => {
+        const newDate = dates[res.tapIndex]
+        setEditingDate(newDate)
+        console.log('[Record] Switched date to', newDate)
+      }
     })
-    Taro.showToast({ title: '记录已保存', icon: 'success' })
-    console.log('[Record] Saved sleep record', { bedTime, wakeTime, nightWakeCount, napDuration, coffeeIntake, exerciseDuration })
+  }
+
+  const handleSave = () => {
+    if (existingRecord) {
+      const { calculateSleepDuration, calculateSleepScore } = require('@/utils')
+      const duration = calculateSleepDuration(bedTime, wakeTime)
+      const score = calculateSleepScore({
+        duration,
+        nightWakeCount,
+        napDuration,
+        coffeeIntake,
+        exerciseDuration
+      })
+      updateRecord(existingRecord.id, {
+        bedTime,
+        wakeTime,
+        nightWakeCount,
+        napDuration,
+        coffeeIntake,
+        exerciseDuration,
+        duration,
+        score
+      })
+    } else {
+      addRecord({
+        date: editingDate,
+        bedTime,
+        wakeTime,
+        nightWakeCount,
+        napDuration,
+        coffeeIntake,
+        exerciseDuration
+      })
+    }
+    Taro.showToast({ title: '已保存', icon: 'success' })
+    console.log('[Record] Saved sleep record for', editingDate, { bedTime, wakeTime, nightWakeCount, napDuration, coffeeIntake, exerciseDuration })
   }
 
   const gotoHabits = () => {
     Taro.navigateTo({ url: '/pages/habits/index' })
   }
 
+  const goToTrends = () => {
+    Taro.switchTab({ url: '/pages/trends/index' })
+  }
+
+  const isEditingToday = editingDate === today
+
   return (
     <View className={styles.page}>
       <View className={styles.greeting}>
-        <Text className={styles.greetingText}>晚安，睡眠达人 🌙</Text>
-        <Text className={styles.subText}>记录昨晚睡眠，了解你的健康状态</Text>
+        <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Text className={styles.greetingText}>
+            {isEditingToday ? '睡眠记录 🌙' : `${editingDate} 记录`}
+          </Text>
+          <Button
+            className={styles.sectionAction}
+            onClick={handleDateChange}
+            style={{ marginBottom: 0 }}
+          >
+            切换日期
+          </Button>
+        </View>
+        <Text className={styles.subText}>
+          {isEditingToday ? '记录昨晚睡眠，了解你的健康状态' : '正在编辑历史记录'}
+          {existingRecord && '（已有记录）'}
+        </Text>
       </View>
 
       <View className={styles.section}>
         <SleepScoreCard
-          score={today?.score || 75}
-          duration={today?.duration || 8}
+          score={computedScore}
+          duration={computedDuration}
           bedTime={bedTime}
           wakeTime={wakeTime}
         />
@@ -184,7 +292,9 @@ const RecordPage: React.FC = () => {
         </ScrollView>
       </View>
 
-      <Button className={styles.saveBtn} onClick={handleSave}>保存今日记录</Button>
+      <Button className={styles.saveBtn} onClick={handleSave}>
+        保存{isEditingToday ? '今日' : ''}记录
+      </Button>
     </View>
   )
 }
