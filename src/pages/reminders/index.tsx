@@ -128,6 +128,7 @@ const RemindersPage: React.FC = () => {
       <ReminderEditor
         visible={editorVisible}
         reminder={editingReminder}
+        defaultType={editingType}
         onClose={() => setEditorVisible(false)}
         onSave={handleSave}
         onDelete={handleDelete}

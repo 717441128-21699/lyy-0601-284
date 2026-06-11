@@ -59,6 +59,10 @@ const TrendsPage: React.FC = () => {
     Taro.navigateTo({ url: '/pages/report/index' })
   }
 
+  const gotoFactorAnalysis = () => {
+    Taro.navigateTo({ url: '/pages/factor-analysis/index' })
+  }
+
   return (
     <View className={styles.page}>
       <View className={styles.statsRow}>
@@ -116,7 +120,10 @@ const TrendsPage: React.FC = () => {
       <View className={styles.section}>
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>{mode === 'week' ? '本周' : '本月'}数据统计</Text>
-          <Button className={styles.sectionAction} onClick={gotoReport}>生成报告</Button>
+          <View style={{ display: 'flex', gap: '12rpx' }}>
+            <Button className={styles.sectionAction} onClick={gotoFactorAnalysis}>归因分析</Button>
+            <Button className={styles.sectionAction} onClick={gotoReport}>生成报告</Button>
+          </View>
         </View>
         <View className={styles.summaryCard}>
           <View className={styles.summaryItem}>

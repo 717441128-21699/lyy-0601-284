@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { View, Text, Button, ScrollView } from '@tarojs/components'
-import Taro, { useRouter } from '@tarojs/taro'
+import Taro, { useRouter, useDidShow } from '@tarojs/taro'
 import SleepScoreCard from '@/components/SleepScoreCard'
 import RecordItem from '@/components/RecordItem'
 import { useSleepStore } from '@/store/SleepStore'
@@ -9,16 +9,29 @@ import styles from './index.module.scss'
 
 const RecordPage: React.FC = () => {
   const router = useRouter()
-  const { records, habits, addRecord, updateRecord } = useSleepStore()
+  const { records, habits, addRecord, updateRecord, editingDate: storeEditingDate, setEditingDate: setStoreEditingDate } = useSleepStore()
   const today = formatDate(new Date())
   const urlDate = router.params.date
   const [editingDate, setEditingDate] = useState(urlDate || today)
+
+  useDidShow(() => {
+    if (storeEditingDate) {
+      setEditingDate(storeEditingDate)
+      console.log('[Record] Got editing date from store:', storeEditingDate)
+    }
+  })
 
   useEffect(() => {
     if (urlDate) {
       setEditingDate(urlDate)
     }
   }, [urlDate])
+
+  useEffect(() => {
+    if (storeEditingDate && storeEditingDate !== editingDate) {
+      setEditingDate(storeEditingDate)
+    }
+  }, [storeEditingDate])
 
   const existingRecord = useMemo(() => {
     return records.find(r => r.date === editingDate)

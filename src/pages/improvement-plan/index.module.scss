@@ -1,0 +1,289 @@
+@import '@/styles/variables.scss';
+@import '@/styles/theme.scss';
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F0ECF9 0%, #FFFFFF 30%);
+  padding: 24rpx 24rpx 120rpx;
+}
+
+.header {
+  margin-bottom: 24rpx;
+
+  &Title {
+    font-size: 40rpx;
+    font-weight: bold;
+    color: $text-primary;
+    margin-bottom: 8rpx;
+  }
+
+  &Desc {
+    font-size: 26rpx;
+    color: $text-secondary;
+  }
+}
+
+.progressCard {
+  background: linear-gradient(135deg, $primary-color, #8B7EC8);
+  border-radius: 24rpx;
+  padding: 32rpx;
+  color: #fff;
+  margin-bottom: 32rpx;
+
+  &Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24rpx;
+  }
+
+  &Title {
+    font-size: 32rpx;
+    font-weight: 600;
+  }
+
+  &Days {
+    font-size: 24rpx;
+    opacity: 0.9;
+  }
+
+  &ProgressBar {
+    height: 16rpx;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 8rpx;
+    overflow: hidden;
+    margin-bottom: 16rpx;
+  }
+
+  &ProgressFill {
+    height: 100%;
+    background: #fff;
+    border-radius: 8rpx;
+    transition: width 0.3s ease;
+  }
+
+  &Stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 24rpx;
+    opacity: 0.9;
+  }
+}
+
+.section {
+  margin-bottom: 32rpx;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.sectionTitle {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.sectionAction {
+  font-size: 26rpx;
+  color: $primary-color;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.goalList {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.goalCard {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(91, 95, 199, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  transition: all 0.2s;
+
+  &Completed {
+    opacity: 0.7;
+  }
+
+  &Day {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 50%;
+    background: rgba(91, 95, 199, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &DayNum {
+    font-size: 28rpx;
+    font-weight: bold;
+    color: $primary-color;
+  }
+
+  &DayText {
+    font-size: 20rpx;
+    color: $primary-color;
+  }
+
+  &Completed &Day {
+    background: $success-color;
+
+    .goalCardDayNum, .goalCardDayText {
+      color: #fff;
+    }
+  }
+
+  &Content {
+    flex: 1;
+  }
+
+  &Title {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 6rpx;
+  }
+
+  &Completed &Title {
+    text-decoration: line-through;
+    color: $text-tertiary;
+  }
+
+  &Desc {
+    font-size: 24rpx;
+    color: $text-tertiary;
+    line-height: 1.4;
+  }
+
+  &Check {
+    width: 56rpx;
+    height: 56rpx;
+    border-radius: 50%;
+    border: 3rpx solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  &Checked {
+    background: $success-color;
+    border-color: $success-color;
+
+    &::after {
+      content: '✓';
+      color: #fff;
+      font-size: 32rpx;
+      font-weight: bold;
+    }
+  }
+}
+
+.tipCard {
+  background: linear-gradient(135deg, rgba(250, 173, 20, 0.1), rgba(255, 125, 0, 0.05));
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 32rpx;
+  border-left: 8rpx solid $warning-color;
+
+  &Title {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $warning-color;
+    margin-bottom: 12rpx;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+  }
+
+  &Text {
+    font-size: 26rpx;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.emptyState {
+  text-align: center;
+  padding: 80rpx 40rpx;
+
+  &Icon {
+    font-size: 120rpx;
+    margin-bottom: 24rpx;
+  }
+
+  &Title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 12rpx;
+  }
+
+  &Desc {
+    font-size: 26rpx;
+    color: $text-secondary;
+    margin-bottom: 32rpx;
+    line-height: 1.6;
+  }
+}
+
+.generateBtn {
+  width: 100%;
+  height: 96rpx;
+  background: $primary-color;
+  color: #fff;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(91, 95, 199, 0.3);
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.bottomActions {
+  position: fixed;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20rpx;
+  width: 90%;
+}
+
+.actionBtn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  border: none;
+
+  &Primary {
+    background: $primary-color;
+    color: #fff;
+    box-shadow: 0 8rpx 24rpx rgba(91, 95, 199, 0.3);
+  }
+
+  &Secondary {
+    background: #fff;
+    color: $text-secondary;
+    border: 2rpx solid $border-color;
+  }
+}

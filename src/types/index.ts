@@ -57,3 +57,22 @@ export interface FactorTip {
   impact: 'positive' | 'negative'
   message: string
 }
+
+export interface DailyGoal {
+  id: string
+  day: number
+  title: string
+  description: string
+  icon: string
+  category: 'sleep' | 'coffee' | 'exercise' | 'nap' | 'screen'
+  targetValue?: number
+  unit?: string
+  completed: boolean
+  completedAt?: string
+}
+
+export interface ImprovementPlan {
+  startDate: string
+  goals: DailyGoal[]
+  generatedAt: string
+}

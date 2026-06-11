@@ -7,7 +7,7 @@ import styles from './index.module.scss'
 
 const RecordDetailPage: React.FC = () => {
   const router = useRouter()
-  const { records } = useSleepStore()
+  const { records, setEditingDate } = useSleepStore()
   const date = router.params.date
 
   const record = useMemo(() => {
@@ -17,7 +17,8 @@ const RecordDetailPage: React.FC = () => {
   const quality = record ? getSleepQuality(record.score) : null
 
   const handleEdit = () => {
-    Taro.redirectTo({ url: `/pages/index/index?date=${date}` })
+    setEditingDate(date)
+    Taro.switchTab({ url: '/pages/index/index' })
   }
 
   const handleBack = () => {

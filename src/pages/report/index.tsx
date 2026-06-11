@@ -52,90 +52,90 @@ const ReportPage: React.FC = () => {
     return lineCount + 1
   }
 
-  const drawReportCanvas = (ctx: any, dpr: number, canvasWidth: number) => {
+  const drawReportCanvas = (ctx: any, canvasWidth: number, canvasHeight: number) => {
     const w = canvasWidth
-    const CANVAS_HEIGHT = 1400
-    const h = CANVAS_HEIGHT
+    const h = canvasHeight
+
     const gradient = ctx.createLinearGradient(0, 0, 0, h)
     gradient.addColorStop(0, '#F0ECF9')
     gradient.addColorStop(1, '#FFFFFF')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, w, h)
 
-    const headerGradient = ctx.createLinearGradient(0, 0, w, 260)
+    const headerGradient = ctx.createLinearGradient(0, 0, 0, 180)
     headerGradient.addColorStop(0, '#5B5FC7')
     headerGradient.addColorStop(1, '#8B7EC8')
     ctx.fillStyle = headerGradient
-    ctx.fillRect(0, 0, w, 260)
+    ctx.fillRect(0, 0, w, 180)
 
     ctx.fillStyle = '#FFFFFF'
-    ctx.font = `bold ${32 * dpr}px sans-serif`
-    ctx.fillText('睡眠健康报告', 40 * dpr, 70 * dpr)
+    ctx.font = 'bold 22px sans-serif'
+    ctx.fillText('睡眠健康报告', 24, 48)
 
     const quality = getSleepQuality(reportData.avg30Score)
-    ctx.font = `bold ${72 * dpr}px sans-serif`
+    ctx.font = 'bold 52px sans-serif'
     ctx.fillStyle = '#FFFFFF'
-    ctx.fillText(`${reportData.avg30Score} 分`, 40 * dpr, 155 * dpr)
+    ctx.fillText(`${reportData.avg30Score} 分`, 24, 110)
 
     ctx.fillStyle = quality.color
-    ctx.fillRect(250 * dpr, 115 * dpr, 110 * dpr, 44 * dpr)
+    ctx.fillRect(180, 78, 76, 32)
     ctx.fillStyle = '#FFFFFF'
-    ctx.font = `${22 * dpr}px sans-serif`
-    ctx.fillText(quality.text, 268 * dpr, 148 * dpr)
+    ctx.font = '16px sans-serif'
+    ctx.fillText(quality.text, 192, 102)
 
-    ctx.font = `${22 * dpr}px sans-serif`
+    ctx.font = '14px sans-serif'
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'
-    ctx.fillText(`${profile.name} · 生成于 ${new Date().toLocaleDateString()}`, 40 * dpr, 210 * dpr)
-    ctx.fillText('近30天数据统计', 40 * dpr, 240 * dpr)
+    ctx.fillText(`${profile.name} · ${new Date().toLocaleDateString()}`, 24, 145)
+    ctx.fillText('近30天数据统计', 24, 165)
 
-    let y = 290 * dpr
+    let y = 205
 
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${26 * dpr}px sans-serif`
-    ctx.fillText('📈 趋势变化', 40 * dpr, y)
-    y += 30 * dpr
+    ctx.font = 'bold 18px sans-serif'
+    ctx.fillText('📈 趋势变化', 24, y)
+    y += 24
 
     const trendY = y
     ctx.fillStyle = '#FFFFFF'
-    ctx.fillRect(40 * dpr, trendY, w - 80 * dpr, 140 * dpr)
+    ctx.fillRect(24, trendY, w - 48, 100)
 
     const scoreDiff = reportData.avg7Score - reportData.avg30Score
     const diffText = scoreDiff >= 0 ? `+${scoreDiff}` : `${scoreDiff}`
     const diffColor = scoreDiff >= 0 ? '#52C41A' : '#FF7875'
 
     ctx.fillStyle = '#5E5D7D'
-    ctx.font = `${20 * dpr}px sans-serif`
-    ctx.fillText('近30天均分', 60 * dpr, trendY + 40 * dpr)
+    ctx.font = '13px sans-serif'
+    ctx.fillText('近30天均分', 40, trendY + 28)
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${36 * dpr}px sans-serif`
-    ctx.fillText(`${reportData.avg30Score}`, 60 * dpr, trendY + 82 * dpr)
+    ctx.font = 'bold 24px sans-serif'
+    ctx.fillText(`${reportData.avg30Score}`, 40, trendY + 58)
 
     ctx.fillStyle = '#5E5D7D'
-    ctx.font = `${20 * dpr}px sans-serif`
-    ctx.fillText('近7天均分', w / 2 + 20 * dpr, trendY + 40 * dpr)
+    ctx.font = '13px sans-serif'
+    ctx.fillText('近7天均分', w / 2 + 12, trendY + 28)
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${36 * dpr}px sans-serif`
-    ctx.fillText(`${reportData.avg7Score}`, w / 2 + 20 * dpr, trendY + 82 * dpr)
+    ctx.font = 'bold 24px sans-serif'
+    ctx.fillText(`${reportData.avg7Score}`, w / 2 + 12, trendY + 58)
 
     ctx.fillStyle = diffColor
-    ctx.font = `bold ${26 * dpr}px sans-serif`
-    ctx.fillText(`${diffText}分`, 60 * dpr, trendY + 125 * dpr)
+    ctx.font = 'bold 16px sans-serif'
+    ctx.fillText(`${diffText}分`, 40, trendY + 88)
     ctx.fillStyle = '#5E5D7D'
-    ctx.font = `${20 * dpr}px sans-serif`
-    ctx.fillText(scoreDiff >= 0 ? '较近30天提升' : '较近30天下降', 110 * dpr, trendY + 125 * dpr)
+    ctx.font = '12px sans-serif'
+    ctx.fillText(scoreDiff >= 0 ? '较近30天提升' : '较近30天下降', 80, trendY + 88)
 
     if (reportData.bestDay) {
       ctx.fillStyle = '#FAAD14'
-      ctx.font = `${20 * dpr}px sans-serif`
-      ctx.fillText(`🏆 最佳 ${reportData.bestDay.date} (${reportData.bestDay.score}分)`, w / 2 + 20 * dpr, trendY + 125 * dpr)
+      ctx.font = '12px sans-serif'
+      ctx.fillText(`🏆 最佳 ${reportData.bestDay.date.slice(5)}`, w / 2 + 12, trendY + 88)
     }
 
-    y = trendY + 160 * dpr
+    y = trendY + 120
 
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${26 * dpr}px sans-serif`
-    ctx.fillText('📊 数据概览', 40 * dpr, y)
-    y += 30 * dpr
+    ctx.font = 'bold 18px sans-serif'
+    ctx.fillText('📊 数据概览', 24, y)
+    y += 24
 
     const stats = [
       { label: '平均睡眠时长', value: `${reportData.avgDuration} 小时`, icon: '⏱️' },
@@ -145,58 +145,58 @@ const ReportPage: React.FC = () => {
     ]
 
     stats.forEach((stat, i) => {
-      const rowY = y + 20 * dpr + i * 65 * dpr
+      const rowY = y + 12 + i * 48
       ctx.fillStyle = '#FFFFFF'
-      ctx.fillRect(40 * dpr, rowY - 15 * dpr, w - 80 * dpr, 58 * dpr)
+      ctx.fillRect(24, rowY - 10, w - 48, 42)
 
       ctx.fillStyle = '#5E5D7D'
-      ctx.font = `${24 * dpr}px sans-serif`
-      ctx.fillText(`${stat.icon}  ${stat.label}`, 60 * dpr, rowY + 22 * dpr)
+      ctx.font = '15px sans-serif'
+      ctx.fillText(`${stat.icon}  ${stat.label}`, 40, rowY + 18)
 
       ctx.fillStyle = '#1A1B3E'
-      ctx.font = `bold ${26 * dpr}px sans-serif`
-      const textWidth = ctx.measureText ? ctx.measureText(stat.value).width : 100
-      ctx.fillText(stat.value, w - 60 * dpr - textWidth, rowY + 22 * dpr)
+      ctx.font = 'bold 17px sans-serif'
+      const textWidth = ctx.measureText ? ctx.measureText(stat.value).width : 80
+      ctx.fillText(stat.value, w - 40 - textWidth, rowY + 18)
     })
 
-    y += stats.length * 65 * dpr + 30 * dpr
+    y += stats.length * 48 + 24
 
     ctx.fillStyle = '#1A1B3E'
-    ctx.font = `bold ${26 * dpr}px sans-serif`
-    ctx.fillText('💡 改善建议', 40 * dpr, y)
-    y += 30 * dpr
+    ctx.font = 'bold 18px sans-serif'
+    ctx.fillText('💡 改善建议', 24, y)
+    y += 24
 
     const tips = factorTips.length > 0 ? factorTips.slice(0, 3) : [
       { factor: '继续保持', impact: 'positive' as const, message: '你的睡眠状态良好，请继续保持规律作息和健康生活习惯。' }
     ]
 
     tips.forEach((tip, i) => {
-      const tipY = y + 15 * dpr + i * 110 * dpr
+      const tipY = y + 12 + i * 80
       ctx.fillStyle = '#FFFFFF'
-      ctx.fillRect(40 * dpr, tipY, w - 80 * dpr, 100 * dpr)
+      ctx.fillRect(24, tipY, w - 48, 72)
 
       const barColor = tip.impact === 'positive' ? '#52C41A' : '#FFB870'
       ctx.fillStyle = barColor
-      ctx.fillRect(40 * dpr, tipY, 6 * dpr, 100 * dpr)
+      ctx.fillRect(24, tipY, 4, 72)
 
       ctx.fillStyle = '#1A1B3E'
-      ctx.font = `bold ${24 * dpr}px sans-serif`
-      ctx.fillText(tip.factor, 60 * dpr, tipY + 38 * dpr)
+      ctx.font = 'bold 16px sans-serif'
+      ctx.fillText(tip.factor, 40, tipY + 28)
 
       ctx.fillStyle = '#5E5D7D'
-      ctx.font = `${20 * dpr}px sans-serif`
-      wrapText(ctx, tip.message, 60 * dpr, tipY + 68 * dpr, w - 160 * dpr, 24 * dpr)
+      ctx.font = '14px sans-serif'
+      wrapText(ctx, tip.message, 40, tipY + 50, w - 100, 20)
     })
 
-    y += tips.length * 110 * dpr + 40 * dpr
+    y += tips.length * 80 + 30
 
     ctx.fillStyle = '#9A99B8'
-    ctx.font = `${20 * dpr}px sans-serif`
+    ctx.font = '13px sans-serif'
     ctx.textAlign = 'center'
-    ctx.fillText('—— 好梦睡眠 · 科学睡眠健康管理 ——', w / 2, h - 40 * dpr)
+    ctx.fillText('—— 好梦睡眠 · 科学睡眠健康管理 ——', w / 2, h - 24)
     ctx.textAlign = 'left'
 
-    console.log('[Report] Canvas drawn, height:', h)
+    console.log('[Report] Canvas drawn, size:', w, 'x', h)
   }
 
   const generateShareImage = async () => {
@@ -224,13 +224,13 @@ const ReportPage: React.FC = () => {
           const ctx = canvas.getContext('2d')
           const dpr = Taro.getSystemInfoSync().pixelRatio || 2
           const canvasWidth = 375
-          const canvasHeight = 700
+          const canvasHeight = 600
 
           canvas.width = canvasWidth * dpr
           canvas.height = canvasHeight * dpr
           ctx.scale(dpr, dpr)
 
-          drawReportCanvas(ctx, 1, canvasWidth)
+          drawReportCanvas(ctx, canvasWidth, canvasHeight)
 
           setTimeout(() => {
             Taro.canvasToTempFilePath({
@@ -403,12 +403,33 @@ const ReportPage: React.FC = () => {
         )}
       </View>
 
+      <View className={styles.section}>
+        <View className={styles.sectionHeader} style={{ marginBottom: '0' }}>
+          <Text className={styles.sectionTitle}>定制改善计划</Text>
+        </View>
+        <View
+          className={styles.planCard}
+          onClick={() => Taro.navigateTo({ url: '/pages/improvement-plan/index' })}
+        >
+          <View className={styles.planCardLeft}>
+            <Text className={styles.planCardIcon}>🌟</Text>
+            <View>
+              <Text className={styles.planCardTitle}>7天睡眠改善计划</Text>
+              <Text className={styles.planCardDesc}>
+                根据你的睡眠数据，生成专属改善目标
+              </Text>
+            </View>
+          </View>
+          <Text className={styles.planCardArrow}>›</Text>
+        </View>
+      </View>
+
       <View className={styles.canvasContainer}>
         <Canvas
           id="reportCanvas"
           type="2d"
           ref={canvasRef}
-          style={{ width: '375px', height: '700px' }}
+          style={{ width: '375px', height: '600px' }}
         />
       </View>
 

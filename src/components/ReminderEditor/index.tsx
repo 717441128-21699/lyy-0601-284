@@ -8,6 +8,7 @@ import styles from './index.module.scss'
 interface ReminderEditorProps {
   visible: boolean
   reminder?: Reminder | null
+  defaultType?: Reminder['type']
   onClose: () => void
   onSave: (reminder: Partial<Reminder>) => void
   onDelete?: (id: string) => void
@@ -22,8 +23,8 @@ const TYPES: { type: Reminder['type']; name: string; icon: string }[] = [
 
 const WEEK_DAYS = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 
-const ReminderEditor: React.FC<ReminderEditorProps> = ({ visible, reminder, onClose, onSave, onDelete }) => {
-  const [type, setType] = useState<Reminder['type']>('bedtime')
+const ReminderEditor: React.FC<ReminderEditorProps> = ({ visible, reminder, defaultType = 'bedtime', onClose, onSave, onDelete }) => {
+  const [type, setType] = useState<Reminder['type']>(defaultType)
   const [time, setTime] = useState('22:30')
   const [repeat, setRepeat] = useState<string[]>(['每天'])
 
@@ -33,11 +34,14 @@ const ReminderEditor: React.FC<ReminderEditorProps> = ({ visible, reminder, onCl
       setTime(reminder.time)
       setRepeat([...reminder.repeat])
     } else {
-      setType('bedtime')
-      setTime('22:30')
+      setType(defaultType)
+      if (defaultType === 'bedtime') setTime('22:30')
+      else if (defaultType === 'wakeup') setTime('07:00')
+      else if (defaultType === 'screen') setTime('21:30')
+      else if (defaultType === 'abnormal') setTime('08:00')
       setRepeat(['每天'])
     }
-  }, [reminder, visible])
+  }, [reminder, visible, defaultType])
 
   if (!visible) return null
 

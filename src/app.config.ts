@@ -7,7 +7,9 @@ export default defineAppConfig({
     'pages/settings/index',
     'pages/habits/index',
     'pages/report/index',
-    'pages/record-detail/index'
+    'pages/record-detail/index',
+    'pages/factor-analysis/index',
+    'pages/improvement-plan/index'
   ],
   window: {
     backgroundTextStyle: 'light',

@@ -1,0 +1,289 @@
+@import '@/styles/variables.scss';
+@import '@/styles/theme.scss';
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #F0ECF9 0%, #FFFFFF 30%);
+  padding: 24rpx 24rpx 120rpx;
+}
+
+.header {
+  margin-bottom: 24rpx;
+
+  &Title {
+    font-size: 40rpx;
+    font-weight: bold;
+    color: $text-primary;
+    margin-bottom: 8rpx;
+  }
+
+  &Desc {
+    font-size: 26rpx;
+    color: $text-secondary;
+  }
+}
+
+.tabs {
+  display: flex;
+  background: rgba(91, 95, 199, 0.08);
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 32rpx;
+
+  &Item {
+    flex: 1;
+    text-align: center;
+    padding: 18rpx 0;
+    font-size: 28rpx;
+    color: $text-secondary;
+    border-radius: 12rpx;
+    transition: all 0.2s;
+
+    &Active {
+      background: $primary-color;
+      color: #fff;
+      font-weight: 500;
+    }
+  }
+}
+
+.section {
+  margin-bottom: 32rpx;
+}
+
+.sectionTitle {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 20rpx;
+}
+
+.overviewCard {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(91, 95, 199, 0.06);
+
+  &Row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20rpx;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &Label {
+    font-size: 28rpx;
+    color: $text-secondary;
+  }
+
+  &Value {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &Good {
+    color: $success-color;
+  }
+
+  &Bad {
+    color: $danger-color;
+  }
+}
+
+.factorList {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.factorCard {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(91, 95, 199, 0.06);
+  transition: all 0.2s;
+
+  &Active {
+    box-shadow: 0 8rpx 30rpx rgba(91, 95, 199, 0.12);
+  }
+
+  &Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &Left {
+    display: flex;
+    align-items: center;
+    gap: 20rpx;
+  }
+
+  &Icon {
+    width: 80rpx;
+    height: 80rpx;
+    border-radius: 20rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40rpx;
+    background: rgba(91, 95, 199, 0.1);
+  }
+
+  &Info {
+    flex: 1;
+  }
+
+  &Name {
+    font-size: 30rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 6rpx;
+  }
+
+  &Desc {
+    font-size: 24rpx;
+    color: $text-tertiary;
+  }
+
+  &Impact {
+    text-align: right;
+
+    &Value {
+      font-size: 28rpx;
+      font-weight: 600;
+      margin-bottom: 4rpx;
+    }
+
+    &Positive {
+      color: $success-color;
+    }
+
+    &Negative {
+      color: $danger-color;
+    }
+
+    &Label {
+      font-size: 22rpx;
+      color: $text-tertiary;
+    }
+  }
+
+  &Arrow {
+    font-size: 32rpx;
+    color: $text-tertiary;
+    transition: transform 0.2s;
+
+    &Up {
+      transform: rotate(180deg);
+    }
+  }
+
+  &Detail {
+    margin-top: 24rpx;
+    padding-top: 24rpx;
+    border-top: 1rpx solid $border-color;
+    display: none;
+
+    &Visible {
+      display: block;
+    }
+  }
+
+  &DetailTitle {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16rpx;
+  }
+}
+
+.badDayList {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.badDayItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 20rpx;
+  background: rgba(255, 77, 79, 0.05);
+  border-radius: 12rpx;
+  border-left: 6rpx solid $danger-color;
+
+  &Date {
+    font-size: 26rpx;
+    color: $text-primary;
+    font-weight: 500;
+  }
+
+  &Value {
+    font-size: 24rpx;
+    color: $text-secondary;
+  }
+
+  &Score {
+    font-size: 26rpx;
+    font-weight: 600;
+    color: $danger-color;
+  }
+}
+
+.goodDayItem {
+  border-left-color: $success-color;
+  background: rgba(82, 196, 26, 0.05);
+
+  .badDayItemScore {
+    color: $success-color;
+  }
+}
+
+.tipCard {
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.08), rgba(139, 126, 200, 0.05));
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 32rpx;
+
+  &Title {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: $primary-color;
+    margin-bottom: 12rpx;
+    display: flex;
+    align-items: center;
+    gap: 10rpx;
+  }
+
+  &Text {
+    font-size: 26rpx;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.backBtn {
+  position: fixed;
+  bottom: 40rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600rpx;
+  height: 88rpx;
+  background: $primary-color;
+  color: #fff;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(91, 95, 199, 0.3);
+
+  &:active {
+    opacity: 0.9;
+  }
+}

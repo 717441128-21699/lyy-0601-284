@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import Taro from '@tarojs/taro'
-import type { SleepRecord, Habit, Reminder, UserProfile } from '@/types'
+import type { SleepRecord, Habit, Reminder, UserProfile, ImprovementPlan, DailyGoal } from '@/types'
 import { mockSleepRecords, mockHabits, mockReminders, mockUserProfile } from '@/data/mockData'
 import { calculateSleepDuration, calculateSleepScore, generateId, formatDate } from '@/utils'
 
@@ -11,6 +11,7 @@ interface StoredData {
   habits: Habit[]
   reminders: Reminder[]
   profile: UserProfile
+  improvementPlan: ImprovementPlan | null
 }
 
 const loadFromStorage = (): StoredData => {
@@ -27,7 +28,8 @@ const loadFromStorage = (): StoredData => {
     records: mockSleepRecords,
     habits: mockHabits,
     reminders: mockReminders,
-    profile: mockUserProfile
+    profile: mockUserProfile,
+    improvementPlan: null
   }
 }
 
@@ -45,6 +47,8 @@ interface SleepContextType {
   habits: Habit[]
   reminders: Reminder[]
   profile: UserProfile
+  editingDate: string | null
+  improvementPlan: ImprovementPlan | null
   addRecord: (record: Partial<SleepRecord>) => void
   updateRecord: (id: string, record: Partial<SleepRecord>) => void
   toggleHabit: (id: string) => void
@@ -56,6 +60,10 @@ interface SleepContextType {
   deleteReminder: (id: string) => void
   updateProfile: (profile: Partial<UserProfile>) => void
   getTodayRecord: () => SleepRecord | undefined
+  setEditingDate: (date: string | null) => void
+  generateImprovementPlan: () => void
+  toggleDailyGoal: (goalId: string) => void
+  resetImprovementPlan: () => void
   resetData: () => void
 }
 
@@ -63,6 +71,7 @@ const SleepContext = createContext<SleepContextType | null>(null)
 
 export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<StoredData>(() => loadFromStorage())
+  const [editingDate, setEditingDate] = useState<string | null>(null)
 
   useEffect(() => {
     saveToStorage(data)
@@ -189,14 +198,118 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return data.records.find(r => r.date === today)
   }, [data.records])
 
+  const generateImprovementPlan = useCallback(() => {
+    const last7 = data.records.slice(-7)
+    const avgCoffee = last7.length > 0
+      ? last7.reduce((s, r) => s + r.coffeeIntake, 0) / last7.length
+      : 1
+    const avgExercise = last7.length > 0
+      ? last7.reduce((s, r) => s + r.exerciseDuration, 0) / last7.length
+      : 30
+    const avgWake = last7.length > 0
+      ? last7.reduce((s, r) => s + r.nightWakeCount, 0) / last7.length
+      : 1
+    const avgNap = last7.length > 0
+      ? last7.reduce((s, r) => s + r.napDuration, 0) / last7.length
+      : 30
+    const avgScore = last7.length > 0
+      ? last7.reduce((s, r) => s + r.score, 0) / last7.length
+      : 70
+
+    const today = formatDate(new Date())
+
+    const goalTemplates: Array<{ title: string; description: string; icon: string; category: DailyGoal['category']; condition: boolean }> = [
+      { title: '减少咖啡摄入', description: '下午3点后不喝咖啡，每天不超过2杯', icon: '☕', category: 'coffee', condition: avgCoffee > 1.5 },
+      { title: '增加运动时间', description: '每天保持30分钟中等强度有氧运动', icon: '🏃', category: 'exercise', condition: avgExercise < 25 },
+      { title: '减少夜醒次数', description: '睡前避免大量饮水，保持卧室舒适温度', icon: '😴', category: 'sleep', condition: avgWake > 1.5 },
+      { title: '控制午睡时长', description: '午睡控制在30分钟内，避免影响夜间睡眠', icon: '💤', category: 'nap', condition: avgNap > 40 },
+      { title: '提前上床时间', description: '每天提前15分钟上床，逐步调整到23点前入睡', icon: '🛏️', category: 'sleep', condition: avgScore < 70 },
+      { title: '睡前远离屏幕', description: '睡前1小时放下手机，可听轻音乐助眠', icon: '📱', category: 'screen', condition: true }
+    ]
+
+    const selectedGoals = goalTemplates.filter(g => g.condition).slice(0, 4)
+    if (selectedGoals.length < 4) {
+      const backupGoals = goalTemplates.filter(g => !g.condition).slice(0, 4 - selectedGoals.length)
+      selectedGoals.push(...backupGoals)
+    }
+
+    const goals: DailyGoal[] = selectedGoals.slice(0, 4).map((goal, idx) => ({
+      id: generateId(),
+      day: idx + 1,
+      title: goal.title,
+      description: goal.description,
+      icon: goal.icon,
+      category: goal.category,
+      completed: false
+    }))
+
+    const plan: ImprovementPlan = {
+      startDate: today,
+      goals,
+      generatedAt: new Date().toISOString()
+    }
+
+    setData(prev => ({ ...prev, improvementPlan: plan }))
+    console.log('[Store] Generated improvement plan with', goals.length, 'goals')
+  }, [data.records])
+
+  const toggleDailyGoal = useCallback((goalId: string) => {
+    setData(prev => {
+      if (!prev.improvementPlan) return prev
+
+      const newGoals = prev.improvementPlan.goals.map(g => {
+        if (g.id !== goalId) return g
+        const completed = !g.completed
+        if (completed && !g.completed) {
+          const habitName = `改善计划：${g.title}`
+          const existingHabit = prev.habits.find(h => h.name === habitName)
+          if (!existingHabit) {
+            setTimeout(() => {
+              addHabit({
+                name: habitName,
+                description: g.description,
+                icon: g.icon,
+                targetDays: 7
+              })
+            }, 0)
+          } else {
+            setTimeout(() => {
+              toggleHabit(existingHabit.id)
+            }, 0)
+          }
+        }
+        return {
+          ...g,
+          completed,
+          completedAt: completed ? formatDate(new Date()) : undefined
+        }
+      })
+
+      return {
+        ...prev,
+        improvementPlan: {
+          ...prev.improvementPlan,
+          goals: newGoals
+        }
+      }
+    })
+  }, [addHabit, toggleHabit])
+
+  const resetImprovementPlan = useCallback(() => {
+    setData(prev => ({ ...prev, improvementPlan: null }))
+    Taro.showToast({ title: '已重置计划', icon: 'success' })
+  }, [])
+
   const resetData = useCallback(() => {
     Taro.removeStorageSync(STORAGE_KEY)
     setData({
       records: mockSleepRecords,
       habits: mockHabits,
       reminders: mockReminders,
-      profile: mockUserProfile
+      profile: mockUserProfile,
+      improvementPlan: null
     })
+    setEditingDate(null)
     Taro.showToast({ title: '数据已重置', icon: 'success' })
   }, [])
 
@@ -206,6 +319,8 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       habits: data.habits,
       reminders: data.reminders,
       profile: data.profile,
+      editingDate,
+      improvementPlan: data.improvementPlan,
       addRecord,
       updateRecord,
       toggleHabit,
@@ -217,6 +332,10 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       deleteReminder,
       updateProfile,
       getTodayRecord,
+      setEditingDate,
+      generateImprovementPlan,
+      toggleDailyGoal,
+      resetImprovementPlan,
       resetData
     }}>
       {children}
