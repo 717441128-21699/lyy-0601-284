@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { View, Text, Button } from '@tarojs/components'
+import classnames from 'classnames'
 import styles from './index.module.scss'
 
 interface TrendChartProps {
@@ -7,10 +8,20 @@ interface TrendChartProps {
   title?: string
   maxValue?: number
   unit?: string
+  mode?: 'week' | 'month'
+  onModeChange?: (mode: 'week' | 'month') => void
+  hideTabs?: boolean
 }
 
-const TrendChart: React.FC<TrendChartProps> = ({ data, title = '睡眠趋势', maxValue = 100, unit = '分' }) => {
-  const [mode, setMode] = useState<'week' | 'month'>('week')
+const TrendChart: React.FC<TrendChartProps> = ({
+  data,
+  title = '睡眠趋势',
+  maxValue = 100,
+  unit = '分',
+  mode = 'week',
+  onModeChange,
+  hideTabs = false
+}) => {
   const avgValue = data.length > 0 ? Math.round(data.reduce((s, d) => s + d.value, 0) / data.length) : 0
   const avgPosition = 100 - (avgValue / maxValue) * 100
 
@@ -18,20 +29,22 @@ const TrendChart: React.FC<TrendChartProps> = ({ data, title = '睡眠趋势', m
     <View className={styles.chart}>
       <View className={styles.header}>
         <Text className={styles.title}>{title}</Text>
-        <View className={styles.tabs}>
-          <Button
-            className={`${styles.tab} ${mode === 'week' ? styles.tabActive : ''}`}
-            onClick={() => setMode('week')}
-          >
-            周
-          </Button>
-          <Button
-            className={`${styles.tab} ${mode === 'month' ? styles.tabActive : ''}`}
-            onClick={() => setMode('month')}
-          >
-            月
-          </Button>
-        </View>
+        {!hideTabs && (
+          <View className={styles.tabs}>
+            <Button
+              className={classnames(styles.tab, mode === 'week' && styles.tabActive)}
+              onClick={() => onModeChange?.('week')}
+            >
+              周
+            </Button>
+            <Button
+              className={classnames(styles.tab, mode === 'month' && styles.tabActive)}
+              onClick={() => onModeChange?.('month')}
+            >
+              月
+            </Button>
+          </View>
+        )}
       </View>
       <View className={styles.chartBody}>
         <View className={styles.bars}>
@@ -49,9 +62,12 @@ const TrendChart: React.FC<TrendChartProps> = ({ data, title = '睡眠趋势', m
         </View>
       </View>
       <View className={styles.xAxis}>
-        {data.map((item, idx) => (
-          <Text className={styles.barLabel} key={idx}>{item.label}</Text>
-        ))}
+        {data.map((item, idx) => {
+          if (mode === 'month' && idx % 5 !== 0 && idx !== data.length - 1) {
+            return <Text className={styles.barLabel} key={idx} />
+          }
+          return <Text className={styles.barLabel} key={idx}>{item.label}</Text>
+        })}
       </View>
     </View>
   )

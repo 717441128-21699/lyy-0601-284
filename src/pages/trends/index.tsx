@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { View, Text, Button } from '@tarojs/components'
 import Taro from '@tarojs/taro'
 import TrendChart from '@/components/TrendChart'
@@ -8,36 +8,46 @@ import styles from './index.module.scss'
 
 const TrendsPage: React.FC = () => {
   const { records } = useSleepStore()
+  const [mode, setMode] = useState<'week' | 'month'>('week')
 
-  const weekData = useMemo(() => {
-    const last7 = records.slice(-7)
-    return last7.map(r => ({
+  const displayData = useMemo(() => {
+    const count = mode === 'week' ? 7 : 30
+    const data = records.slice(-count)
+    return data.map(r => ({
       date: r.date,
       value: r.score,
       label: r.date.slice(5).replace('-', '/')
     }))
-  }, [records])
+  }, [records, mode])
 
   const durationData = useMemo(() => {
-    const last7 = records.slice(-7)
-    return last7.map(r => ({
+    const count = mode === 'week' ? 7 : 30
+    const data = records.slice(-count)
+    return data.map(r => ({
       date: r.date,
       value: Math.min(12, r.duration),
       label: r.date.slice(5).replace('-', '/')
     }))
-  }, [records])
+  }, [records, mode])
 
   const summary = useMemo(() => {
-    const last7 = records.slice(-7)
-    const avgScore = Math.round(last7.reduce((s, r) => s + r.score, 0) / last7.length)
-    const avgDuration = (last7.reduce((s, r) => s + r.duration, 0) / last7.length).toFixed(1)
-    const avgWake = Math.round(last7.reduce((s, r) => s + r.nightWakeCount, 0) / last7.length * 10) / 10
-    const avgCoffee = Math.round(last7.reduce((s, r) => s + r.coffeeIntake, 0) / last7.length * 10) / 10
-    const avgExercise = Math.round(last7.reduce((s, r) => s + r.exerciseDuration, 0) / last7.length)
+    const count = mode === 'week' ? 7 : 30
+    const data = records.slice(-count)
+    if (data.length === 0) {
+      return { avgScore: 0, avgDuration: '0', avgWake: '0', avgCoffee: '0', avgExercise: 0 }
+    }
+    const avgScore = Math.round(data.reduce((s, r) => s + r.score, 0) / data.length)
+    const avgDuration = (data.reduce((s, r) => s + r.duration, 0) / data.length).toFixed(1)
+    const avgWake = (data.reduce((s, r) => s + r.nightWakeCount, 0) / data.length).toFixed(1)
+    const avgCoffee = (data.reduce((s, r) => s + r.coffeeIntake, 0) / data.length).toFixed(1)
+    const avgExercise = Math.round(data.reduce((s, r) => s + r.exerciseDuration, 0) / data.length)
     return { avgScore, avgDuration, avgWake, avgCoffee, avgExercise }
-  }, [records])
+  }, [records, mode])
 
-  const factorTips = useMemo(() => getFactorTips(records.slice(-14)), [records])
+  const factorTips = useMemo(() => {
+    const count = mode === 'week' ? 7 : 30
+    return getFactorTips(records.slice(-count))
+  }, [records, mode])
 
   const gotoReport = () => {
     Taro.navigateTo({ url: '/pages/report/index' })
@@ -49,26 +59,39 @@ const TrendsPage: React.FC = () => {
         <View className={styles.statCard}>
           <Text className={styles.statValue}>{summary.avgScore}</Text>
           <Text className={styles.statUnit}> 分</Text>
-          <Text className={styles.statLabel}>周平均评分</Text>
+          <Text className={styles.statLabel}>{mode === 'week' ? '周' : '月'}平均评分</Text>
         </View>
         <View className={styles.statCard}>
           <Text className={styles.statValue}>{summary.avgDuration}</Text>
           <Text className={styles.statUnit}> 小时</Text>
-          <Text className={styles.statLabel}>周平均时长</Text>
+          <Text className={styles.statLabel}>{mode === 'week' ? '周' : '月'}平均时长</Text>
         </View>
       </View>
 
       <View className={styles.section}>
-        <TrendChart data={weekData} title="睡眠评分趋势" maxValue={100} unit="分" />
+        <TrendChart
+          data={displayData}
+          title="睡眠评分趋势"
+          maxValue={100}
+          unit="分"
+          mode={mode}
+          onModeChange={setMode}
+        />
       </View>
 
       <View className={styles.section}>
-        <TrendChart data={durationData} title="睡眠时长趋势" maxValue={12} unit="h" />
+        <TrendChart
+          data={durationData}
+          title="睡眠时长趋势"
+          maxValue={12}
+          unit="h"
+          hideTabs
+        />
       </View>
 
       <View className={styles.section}>
         <View className={styles.sectionHeader}>
-          <Text className={styles.sectionTitle}>本周数据统计</Text>
+          <Text className={styles.sectionTitle}>{mode === 'week' ? '本周' : '本月'}数据统计</Text>
           <Button className={styles.sectionAction} onClick={gotoReport}>生成报告</Button>
         </View>
         <View className={styles.summaryCard}>
@@ -80,7 +103,7 @@ const TrendsPage: React.FC = () => {
           </View>
           <View className={styles.summaryItem}>
             <Text className={styles.summaryLabel}>平均睡眠时长</Text>
-            <Text className={`${styles.summaryValue} ${summary.avgDuration >= 7 ? styles.summaryValueGood : ''}`}>
+            <Text className={`${styles.summaryValue} ${Number(summary.avgDuration) >= 7 ? styles.summaryValueGood : ''}`}>
               {summary.avgDuration} 小时
             </Text>
           </View>

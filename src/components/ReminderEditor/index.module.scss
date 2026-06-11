@@ -1,0 +1,201 @@
+@use '@/styles/variables.scss' as *;
+
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  width: 100%;
+  background: $color-bg-page;
+  border-radius: $radius-xl $radius-xl 0 0;
+  padding: $spacing-xl $spacing-lg $spacing-xl;
+  animation: slideUp 0.3s ease-out;
+  @include safe-bottom;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.closeBtn {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.7; }
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.typeRow {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.typeItem {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg $spacing-md;
+  text-align: center;
+  border: 2rpx solid transparent;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}
+
+.typeItemActive {
+  border-color: $color-primary;
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.08), rgba(139, 126, 200, 0.08));
+}
+
+.typeIcon {
+  font-size: 48rpx;
+  margin-bottom: $spacing-sm;
+}
+
+.typeName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.typeItemActive .typeName {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+}
+
+.timeDisplay {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  text-align: center;
+}
+
+.timeValue {
+  font-size: 64rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  font-family: 'DIN Alternate', -apple-system, sans-serif;
+}
+
+.timeBtn {
+  flex: 1;
+  height: 100rpx;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { background: $color-bg-hover; }
+}
+
+.repeatGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.repeatItem {
+  flex: 0 0 calc(25% - #{($spacing-sm * 3) / 4});
+  padding: $spacing-md 0;
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  border: 2rpx solid transparent;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}
+
+.repeatItemActive {
+  background: linear-gradient(135deg, $color-primary, $color-primary-light);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+  border-color: transparent;
+}
+
+.dangerZone {
+  margin-top: $spacing-xl;
+  padding-top: $spacing-lg;
+  border-top: 1rpx solid $color-divider;
+}
+
+.deleteBtn {
+  width: 100%;
+  height: $button-height-md;
+  background: rgba(255, 77, 79, 0.08);
+  color: $color-error;
+  font-size: $font-size-md;
+  border-radius: $radius-lg;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.7; }
+}
+
+.saveBtn {
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-button;
+  @include button-reset;
+  box-shadow: 0 8rpx 24rpx rgba(91, 95, 199, 0.35);
+  transition: all $transition-fast;
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}

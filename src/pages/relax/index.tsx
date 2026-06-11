@@ -1,16 +1,50 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { View, Text, Button } from '@tarojs/components'
+import Taro from '@tarojs/taro'
 import RelaxCard from '@/components/RelaxCard'
-import { mockRelaxItems, mockChecklistItems } from '@/data/mockData'
+import { noiseSources, mockChecklistItems } from '@/data/mockData'
 import styles from './index.module.scss'
 
 const RelaxPage: React.FC = () => {
   const [breathing, setBreathing] = useState(false)
   const [breathPhase, setBreathPhase] = useState<'准备' | '吸气' | '屏息' | '呼气'>('准备')
   const [scale, setScale] = useState(1)
-  const [playingNoise, setPlayingNoise] = useState<string | null>(null)
+  const [playingNoiseId, setPlayingNoiseId] = useState<string | null>(null)
   const [checklist, setChecklist] = useState(mockChecklistItems)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const audioRef = useRef<any>(null)
+
+  useEffect(() => {
+    audioRef.current = Taro.createInnerAudioContext()
+    audioRef.current.loop = true
+    audioRef.current.onPlay(() => {
+      console.log('[Relax] Audio played')
+    })
+    audioRef.current.onPause(() => {
+      console.log('[Relax] Audio paused')
+    })
+    audioRef.current.onError((err: any) => {
+      console.error('[Relax] Audio error', err)
+      Taro.showToast({ title: '音频加载失败', icon: 'none' })
+      setPlayingNoiseId(null)
+    })
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.stop()
+        audioRef.current.destroy()
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.stop()
+      }
+      setPlayingNoiseId(null)
+      console.log('[Relax] Page unmount, audio stopped')
+    }
+  }, [])
 
   useEffect(() => {
     if (breathing) {
@@ -38,9 +72,24 @@ const RelaxPage: React.FC = () => {
     }
   }, [breathing])
 
-  const toggleNoise = (id: string) => {
-    setPlayingNoise(prev => prev === id ? null : id)
-    console.log('[Relax] Toggle noise', id, playingNoise === id ? 'stop' : 'play')
+  const toggleNoise = (noiseId: string) => {
+    const noise = noiseSources.find(n => n.id === noiseId)
+    if (!noise) return
+
+    if (playingNoiseId === noiseId) {
+      audioRef.current?.pause()
+      setPlayingNoiseId(null)
+      console.log('[Relax] Pause noise:', noise.name)
+    } else {
+      if (audioRef.current) {
+        audioRef.current.stop()
+        audioRef.current.src = noise.url
+        audioRef.current.play()
+        setPlayingNoiseId(noiseId)
+        console.log('[Relax] Play noise:', noise.name, noise.url)
+        Taro.showToast({ title: `播放 ${noise.name}`, icon: 'none', duration: 1500 })
+      }
+    }
   }
 
   const toggleCheckItem = (id: string) => {
@@ -48,9 +97,6 @@ const RelaxPage: React.FC = () => {
       item.id === id ? { ...item, checked: !item.checked } : item
     ))
   }
-
-  const breathingItems = mockRelaxItems.filter(i => i.type === 'breathing')
-  const noiseItems = mockRelaxItems.filter(i => i.type === 'whitenoise')
 
   return (
     <View className={styles.page}>
@@ -86,17 +132,19 @@ const RelaxPage: React.FC = () => {
         <Text className={styles.sectionTitle}>白噪音</Text>
       </View>
       <View className={styles.noiseList}>
-        {noiseItems.map(item => (
+        {noiseSources.map(item => (
           <View
             key={item.id}
-            className={`${styles.noiseCard} ${playingNoise === item.id ? styles.noiseCardActive : ''}`}
+            className={`${styles.noiseCard} ${playingNoiseId === item.id ? styles.noiseCardActive : ''}`}
             onClick={() => toggleNoise(item.id)}
           >
             <View className={styles.noiseIcon}>
-              <Text>{playingNoise === item.id ? '🔊' : '🎵'}</Text>
+              <Text>{playingNoiseId === item.id ? '🔊' : '🎵'}</Text>
             </View>
-            <Text className={styles.noiseName}>{item.title}</Text>
-            <Text className={styles.noiseDesc}>{item.duration}分钟 · {playingNoise === item.id ? '播放中' : '点击播放'}</Text>
+            <Text className={styles.noiseName}>{item.name}</Text>
+            <Text className={styles.noiseDesc}>
+              {item.duration}分钟 · {playingNoiseId === item.id ? '播放中' : '点击播放'}
+            </Text>
           </View>
         ))}
       </View>

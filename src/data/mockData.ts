@@ -134,6 +134,37 @@ export const mockReminders: Reminder[] = [
   }
 ]
 
+export const noiseSources = [
+  {
+    id: 'noise_rain',
+    name: '雨声',
+    desc: '柔和的淅沥雨声，帮助快速入眠',
+    duration: 30,
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3'
+  },
+  {
+    id: 'noise_waves',
+    name: '海浪声',
+    desc: '舒缓的海浪拍岸声，营造海边度假氛围',
+    duration: 30,
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-sea-waves-loop-1196.mp3'
+  },
+  {
+    id: 'noise_forest',
+    name: '森林鸟鸣',
+    desc: '清晨森林中的鸟鸣，自然清新',
+    duration: 30,
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-small-birds-in-forest-ambience-26.mp3'
+  },
+  {
+    id: 'noise_fire',
+    name: '篝火声',
+    desc: '温暖的篝火噼啪声，安心放松',
+    duration: 30,
+    url: 'https://assets.mixkit.co/sfx/preview/mixkit-campfire-crackling-1341.mp3'
+  }
+]
+
 export const mockRelaxItems: RelaxItem[] = [
   {
     id: 'relax_1',
@@ -149,33 +180,14 @@ export const mockRelaxItems: RelaxItem[] = [
     description: '深呼吸至腹部，帮助平静思绪进入睡眠状态',
     duration: 10
   },
-  {
-    id: 'relax_3',
-    type: 'whitenoise',
-    title: '雨声',
-    description: '柔和的淅沥雨声，帮助快速入眠',
-    duration: 30
-  },
-  {
-    id: 'relax_4',
-    type: 'whitenoise',
-    title: '海浪声',
-    description: '舒缓的海浪拍岸声，营造海边度假氛围',
-    duration: 30
-  },
-  {
-    id: 'relax_5',
-    type: 'whitenoise',
-    title: '森林鸟鸣',
-    description: '清晨森林中的鸟鸣，自然清新',
-    duration: 30
-  },
-  {
-    id: 'relax_6',
-    type: 'checklist',
-    title: '睡前准备清单',
-    description: '助眠准备事项，确保睡眠环境舒适'
-  }
+  ...noiseSources.map(n => ({
+    id: n.id,
+    type: 'whitenoise' as const,
+    title: n.name,
+    description: n.desc,
+    duration: n.duration,
+    url: n.url
+  }))
 ]
 
 export const mockChecklistItems = [

@@ -133,7 +133,6 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: $radius-md;
-  background: linear-gradient(135deg, rgba(255, 184, 112, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,4 +203,66 @@
   font-size: $font-size-sm;
   color: $color-text-tertiary;
   margin-top: $spacing-md;
+}
+
+.canvasContainer {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 750rpx;
+  z-index: -1;
+}
+
+.previewModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: $spacing-xl;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: $radius-lg;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.3);
+}
+
+.previewActions {
+  display: flex;
+  gap: $spacing-lg;
+  margin-top: $spacing-xl;
+}
+
+.previewBtn {
+  padding: $spacing-md $spacing-xl;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}
+
+.previewBtnSave {
+  background: $color-primary;
+  color: $color-text-white;
+}
+
+.previewBtnCancel {
+  background: rgba(255, 255, 255, 0.2);
+  color: $color-text-white;
+}
+
+.previewTip {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: $font-size-sm;
+  margin-top: $spacing-lg;
 }

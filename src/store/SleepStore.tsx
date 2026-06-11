@@ -1,7 +1,44 @@
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
+import Taro from '@tarojs/taro'
 import type { SleepRecord, Habit, Reminder, UserProfile } from '@/types'
 import { mockSleepRecords, mockHabits, mockReminders, mockUserProfile } from '@/data/mockData'
 import { calculateSleepDuration, calculateSleepScore, generateId, formatDate } from '@/utils'
+
+const STORAGE_KEY = 'sleep_app_data_v1'
+
+interface StoredData {
+  records: SleepRecord[]
+  habits: Habit[]
+  reminders: Reminder[]
+  profile: UserProfile
+}
+
+const loadFromStorage = (): StoredData => {
+  try {
+    const data = Taro.getStorageSync(STORAGE_KEY)
+    if (data) {
+      console.log('[Store] Loaded data from storage')
+      return JSON.parse(data)
+    }
+  } catch (e) {
+    console.error('[Store] Failed to load from storage', e)
+  }
+  return {
+    records: mockSleepRecords,
+    habits: mockHabits,
+    reminders: mockReminders,
+    profile: mockUserProfile
+  }
+}
+
+const saveToStorage = (data: StoredData) => {
+  try {
+    Taro.setStorageSync(STORAGE_KEY, JSON.stringify(data))
+    console.log('[Store] Saved data to storage')
+  } catch (e) {
+    console.error('[Store] Failed to save to storage', e)
+  }
+}
 
 interface SleepContextType {
   records: SleepRecord[]
@@ -12,18 +49,24 @@ interface SleepContextType {
   updateRecord: (id: string, record: Partial<SleepRecord>) => void
   toggleHabit: (id: string) => void
   addHabit: (habit: Partial<Habit>) => void
+  deleteHabit: (id: string) => void
   toggleReminder: (id: string) => void
+  addReminder: (reminder: Partial<Reminder>) => void
+  updateReminder: (id: string, reminder: Partial<Reminder>) => void
+  deleteReminder: (id: string) => void
   updateProfile: (profile: Partial<UserProfile>) => void
   getTodayRecord: () => SleepRecord | undefined
+  resetData: () => void
 }
 
 const SleepContext = createContext<SleepContextType | null>(null)
 
 export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [records, setRecords] = useState<SleepRecord[]>(mockSleepRecords)
-  const [habits, setHabits] = useState<Habit[]>(mockHabits)
-  const [reminders, setReminders] = useState<Reminder[]>(mockReminders)
-  const [profile, setProfile] = useState<UserProfile>(mockUserProfile)
+  const [data, setData] = useState<StoredData>(() => loadFromStorage())
+
+  useEffect(() => {
+    saveToStorage(data)
+  }, [data])
 
   const addRecord = useCallback((record: Partial<SleepRecord>) => {
     const today = formatDate(new Date())
@@ -49,26 +92,34 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       duration,
       score
     }
-    setRecords(prev => {
-      const existing = prev.findIndex(r => r.date === today)
+    setData(prev => {
+      const existing = prev.records.findIndex(r => r.date === today)
+      let newRecords: SleepRecord[]
       if (existing >= 0) {
-        const updated = [...prev]
-        updated[existing] = { ...updated[existing], ...newRecord, id: updated[existing].id }
-        return updated
+        newRecords = [...prev.records]
+        newRecords[existing] = { ...newRecords[existing], ...newRecord, id: newRecords[existing].id }
+      } else {
+        newRecords = [...prev.records, newRecord]
       }
-      return [...prev, newRecord]
+      return { ...prev, records: newRecords }
     })
   }, [])
 
   const updateRecord = useCallback((id: string, record: Partial<SleepRecord>) => {
-    setRecords(prev => prev.map(r => r.id === id ? { ...r, ...record } : r))
+    setData(prev => ({
+      ...prev,
+      records: prev.records.map(r => r.id === id ? { ...r, ...record } : r)
+    }))
   }, [])
 
   const toggleHabit = useCallback((id: string) => {
-    setHabits(prev => prev.map(h => {
-      if (h.id !== id) return h
-      const newCompleted = h.isActive ? h.completedDays : h.completedDays + 1
-      return { ...h, isActive: !h.isActive, completedDays: newCompleted }
+    setData(prev => ({
+      ...prev,
+      habits: prev.habits.map(h => {
+        if (h.id !== id) return h
+        const newCompleted = h.isActive ? h.completedDays : h.completedDays + 1
+        return { ...h, isActive: !h.isActive, completedDays: newCompleted }
+      })
     }))
   }, [])
 
@@ -83,35 +134,90 @@ export const SleepProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       isActive: false,
       createdAt: formatDate(new Date())
     }
-    setHabits(prev => [...prev, newHabit])
+    setData(prev => ({ ...prev, habits: [...prev.habits, newHabit] }))
+  }, [])
+
+  const deleteHabit = useCallback((id: string) => {
+    setData(prev => ({
+      ...prev,
+      habits: prev.habits.filter(h => h.id !== id)
+    }))
   }, [])
 
   const toggleReminder = useCallback((id: string) => {
-    setReminders(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r))
+    setData(prev => ({
+      ...prev,
+      reminders: prev.reminders.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r)
+    }))
+  }, [])
+
+  const addReminder = useCallback((reminder: Partial<Reminder>) => {
+    const newReminder: Reminder = {
+      id: generateId(),
+      type: reminder.type || 'bedtime',
+      title: reminder.title || '新提醒',
+      time: reminder.time || '08:00',
+      enabled: reminder.enabled !== undefined ? reminder.enabled : true,
+      repeat: reminder.repeat || ['每天']
+    }
+    setData(prev => ({ ...prev, reminders: [...prev.reminders, newReminder] }))
+  }, [])
+
+  const updateReminder = useCallback((id: string, reminder: Partial<Reminder>) => {
+    setData(prev => ({
+      ...prev,
+      reminders: prev.reminders.map(r => r.id === id ? { ...r, ...reminder } : r)
+    }))
+  }, [])
+
+  const deleteReminder = useCallback((id: string) => {
+    setData(prev => ({
+      ...prev,
+      reminders: prev.reminders.filter(r => r.id !== id)
+    }))
   }, [])
 
   const updateProfile = useCallback((newProfile: Partial<UserProfile>) => {
-    setProfile(prev => ({ ...prev, ...newProfile }))
+    setData(prev => ({
+      ...prev,
+      profile: { ...prev.profile, ...newProfile }
+    }))
   }, [])
 
   const getTodayRecord = useCallback((): SleepRecord | undefined => {
     const today = formatDate(new Date())
-    return records.find(r => r.date === today)
-  }, [records])
+    return data.records.find(r => r.date === today)
+  }, [data.records])
+
+  const resetData = useCallback(() => {
+    Taro.removeStorageSync(STORAGE_KEY)
+    setData({
+      records: mockSleepRecords,
+      habits: mockHabits,
+      reminders: mockReminders,
+      profile: mockUserProfile
+    })
+    Taro.showToast({ title: '数据已重置', icon: 'success' })
+  }, [])
 
   return (
     <SleepContext.Provider value={{
-      records,
-      habits,
-      reminders,
-      profile,
+      records: data.records,
+      habits: data.habits,
+      reminders: data.reminders,
+      profile: data.profile,
       addRecord,
       updateRecord,
       toggleHabit,
       addHabit,
+      deleteHabit,
       toggleReminder,
+      addReminder,
+      updateReminder,
+      deleteReminder,
       updateProfile,
-      getTodayRecord
+      getTodayRecord,
+      resetData
     }}>
       {children}
     </SleepContext.Provider>
