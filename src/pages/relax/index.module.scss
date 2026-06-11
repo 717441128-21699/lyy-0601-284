@@ -1,0 +1,220 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-gradient;
+  padding: $spacing-lg $page-padding 60rpx;
+}
+
+.breathingSection {
+  margin-bottom: $spacing-xl;
+}
+
+.breathingCard {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  color: $color-text-white;
+  box-shadow: 0 8rpx 32rpx rgba(91, 95, 199, 0.3);
+}
+
+.breathingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+}
+
+.breathingTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.breathingTag {
+  padding: $spacing-xs $spacing-md;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-round;
+  font-size: $font-size-sm;
+}
+
+.breathingCircleWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: $spacing-xl 0;
+}
+
+.breathingCircle {
+  width: 280rpx;
+  height: 280rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 4s ease-in-out;
+}
+
+.breathingCircleInner {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.breathingText {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+}
+
+.breathingHint {
+  margin-top: $spacing-lg;
+  font-size: $font-size-md;
+  opacity: 0.9;
+}
+
+.breathingControl {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+}
+
+.controlBtn {
+  padding: $spacing-sm $spacing-xl;
+  border-radius: $radius-button;
+  font-size: $font-size-md;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}
+
+.btnPrimary {
+  background: $color-text-white;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.btnSecondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: $color-text-white;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.noiseList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+}
+
+.noiseCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  text-align: center;
+  transition: all $transition-fast;
+  &:active { transform: scale(0.96); }
+}
+
+.noiseCardActive {
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.12), rgba(139, 126, 200, 0.12));
+  border: 2rpx solid $color-primary;
+}
+
+.noiseIcon {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.12), rgba(139, 126, 200, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto $spacing-md;
+  font-size: 48rpx;
+}
+
+.noiseName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.noiseDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.checklistSection {
+  margin-top: $spacing-xl;
+}
+
+.checklistCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.checklistItem:last-child {
+  border-bottom: none;
+}
+
+.checkbox {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: $radius-sm;
+  border: 3rpx solid $color-border;
+  margin-right: $spacing-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+}
+
+.checkboxChecked {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.checkmark {
+  color: $color-text-white;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.checklistText {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.checklistTextChecked {
+  color: $color-text-tertiary;
+  text-decoration: line-through;
+}

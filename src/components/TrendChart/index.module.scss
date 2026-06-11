@@ -1,0 +1,108 @@
+@use '@/styles/variables.scss' as *;
+
+.chart {
+  padding: $spacing-lg;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.tabs {
+  display: flex;
+  background: $color-bg-hover;
+  border-radius: $radius-round;
+  padding: 4rpx;
+}
+
+.tab {
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-round;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include button-reset;
+  transition: all $transition-fast;
+}
+
+.tabActive {
+  background: $color-primary;
+  color: $color-text-white;
+}
+
+.chartBody {
+  height: 320rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: $spacing-xl;
+  position: relative;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+.barGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.bar {
+  width: 28rpx;
+  border-radius: $radius-sm $radius-sm 0 0;
+  background: linear-gradient(180deg, $color-primary 0%, $color-primary-light 100%);
+  transition: all $transition-base;
+  min-height: 4rpx;
+}
+
+.barLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+}
+
+.xAxis {
+  position: absolute;
+  bottom: $spacing-lg;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 $spacing-sm;
+}
+
+.avgLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2rpx dashed $color-warm;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: $spacing-xs;
+}
+
+.avgLabel {
+  font-size: $font-size-xs;
+  color: $color-warm;
+  background: $color-bg-card;
+  padding: 0 $spacing-xs;
+}

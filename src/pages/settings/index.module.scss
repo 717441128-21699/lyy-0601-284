@@ -1,0 +1,186 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-gradient;
+  padding: $spacing-lg $page-padding 60rpx;
+}
+
+.profileCard {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  color: $color-text-white;
+  margin-bottom: $spacing-xl;
+  box-shadow: 0 8rpx 32rpx rgba(91, 95, 199, 0.3);
+}
+
+.profileRow {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  margin-right: $spacing-lg;
+}
+
+.profileInfo {
+  flex: 1;
+}
+
+.name {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+}
+
+.meta {
+  font-size: $font-size-sm;
+  opacity: 0.85;
+  margin-top: $spacing-xs;
+}
+
+.section {
+  margin-bottom: $spacing-xl;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+  padding-left: $spacing-sm;
+}
+
+.listCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  transition: all $transition-fast;
+  &:active { background: $color-bg-hover; }
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.listIcon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.12), rgba(139, 126, 200, 0.12));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  margin-right: $spacing-md;
+}
+
+.listLabel {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.listValue {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.listArrow {
+  font-size: 28rpx;
+  color: $color-text-tertiary;
+}
+
+.targetCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.targetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.targetLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.targetSlider {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.targetBtn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-xl;
+  color: $color-primary;
+  @include button-reset;
+  transition: all $transition-fast;
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.95);
+  }
+}
+
+.targetValue {
+  font-size: 48rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  min-width: 160rpx;
+  text-align: center;
+}
+
+.targetUnit {
+  font-size: $font-size-md;
+  font-weight: $font-weight-normal;
+  color: $color-text-secondary;
+}
+
+.targetTip {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-md;
+  text-align: center;
+}
+
+.logoutBtn {
+  width: 100%;
+  height: $button-height-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  color: $color-error;
+  font-size: $font-size-md;
+  @include button-reset;
+  box-shadow: $shadow-card;
+  transition: all $transition-fast;
+  &:active { opacity: 0.8; }
+}

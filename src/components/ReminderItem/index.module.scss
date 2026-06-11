@@ -1,0 +1,107 @@
+@use '@/styles/variables.scss' as *;
+
+.item {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  margin-right: $spacing-md;
+}
+
+.iconBedtime {
+  background: linear-gradient(135deg, rgba(91, 95, 199, 0.12), rgba(139, 126, 200, 0.12));
+}
+
+.iconWakeup {
+  background: linear-gradient(135deg, rgba(255, 184, 112, 0.15), rgba(255, 154, 80, 0.15));
+}
+
+.iconScreen {
+  background: linear-gradient(135deg, rgba(124, 196, 164, 0.15), rgba(100, 176, 140, 0.15));
+}
+
+.iconAbnormal {
+  background: linear-gradient(135deg, rgba(250, 173, 20, 0.15), rgba(255, 140, 0, 0.15));
+}
+
+.info {
+  flex: 1;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  margin-top: $spacing-xs;
+}
+
+.time {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.repeat {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-left: $spacing-md;
+  @include text-ellipsis;
+  max-width: 300rpx;
+}
+
+.switch {
+  width: 96rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: $color-text-disabled;
+  position: relative;
+  transition: all $transition-base;
+}
+
+.switchOn {
+  background: $color-primary;
+}
+
+.switchHandle {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: all $transition-base;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+.switchOn .switchHandle {
+  left: 44rpx;
+}
